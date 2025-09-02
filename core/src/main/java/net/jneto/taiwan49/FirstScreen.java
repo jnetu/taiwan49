@@ -1,5 +1,6 @@
 package net.jneto.taiwan49;
 
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -19,10 +20,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 /** First screen of the application. Displayed after the application is created. */
 public class FirstScreen implements Screen {
 	
-	public final boolean OLED = false;
-	
-
     private final Main game;
+    private final boolean oledMode;
 
     // --- NOVOS OBJETOS PARA CÂMERA E VIEWPORT ---
     private OrthographicCamera camera;
@@ -47,11 +46,13 @@ public class FirstScreen implements Screen {
     private ShapeRenderer shapeRenderer;
 
     /**
-     * O construtor agora aceita a instância do jogo.
+     * O construtor agora aceita a instância do jogo e o modo OLED.
      * @param game A instância principal da classe Main.
+     * @param oledMode Se verdadeiro, ativa o modo OLED.
      */
-    public FirstScreen(final Main game) {
+    public FirstScreen(final Main game, boolean oledMode) {
         this.game = game;
+        this.oledMode = oledMode;
 
         // 1. Cria a câmera e o viewport
         camera = new OrthographicCamera();
@@ -62,6 +63,7 @@ public class FirstScreen implements Screen {
         font = new BitmapFont(); 
         font.setColor(Color.WHITE);
         layout = new GlyphLayout();
+        
         
      // --- CRIA A TEXTURA DO FUNDO VERDE ---
         // 1. Cria um Pixmap (mapa de pixels na memória RAM) de 1x1.
@@ -76,14 +78,13 @@ public class FirstScreen implements Screen {
         
         
         
-        // --- iniciar o shaperenderer
         shapeRenderer = new ShapeRenderer();
         
         
         
         
         //FONTE PERSONALIZADA ---
-     // 1. Aponta para o nosso arquivo .ttf na pasta assets.
+        // 1. Aponta para o nosso arquivo .ttf na pasta assets.
         FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Roboto-Regular.ttf"));
         
         // 2. Cria um objeto de parâmetros para configurar a fonte.
@@ -109,19 +110,14 @@ public class FirstScreen implements Screen {
     @Override
     public void render(float delta) {
         // Limpa a tela
-    	
-    	if(OLED) {
-    		ScreenUtils.clear(0, 0, 0, 1);
-    	}else {
-    		ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1);
-    	}
-        
-        
-        
-        
-        
-        
-     // --- DESENHANDO AS FORMAS (COM SHAPERENDERER) ---
+    
+        if(oledMode) {
+            ScreenUtils.clear(0, 0, 0, 1);
+        }else {
+            ScreenUtils.clear(0.1f, 0.1f, 0.1f, 1);
+        }
+
+        // --- DESENHANDO AS FORMAS (COM SHAPERENDERER) ---
         // Começamos o desenho de formas
         shapeRenderer.begin(ShapeRenderer.ShapeType.Filled); // Queremos formas preenchidas
         
@@ -137,29 +133,18 @@ public class FirstScreen implements Screen {
         shapeRenderer.end();
         
         
-        
-        
-        
-        
-        
         // 3. ATUALIZA A CÂMERA E APLICA O VIEWPORT AO BATCH
         // Isso diz ao SpriteBatch para desenhar no sistema de coordenadas do nosso mundo, não em pixels.
         batch.setProjectionMatrix(camera.combined);
-        
-        
-        
-     
-        
-        
 
         // Inicia o lote de desenho
         batch.begin();
         //batch.draw(greenBackground, 0, 0, WORLD_WIDTH, WORLD_HEIGHT);
         // Agora, usamos as coordenadas do nosso MUNDO VIRTUAL para posicionar o texto
         String meuTexto = "Modo OLED desligado!";
-        if(OLED) {
-        	meuTexto = "Modo OLED ligado!";
-    	}
+        if(oledMode) {
+            meuTexto = "Modo OLED ligado!";
+        }
         
         layout.setText(font, meuTexto);
         float textWidth = layout.width;
@@ -169,15 +154,12 @@ public class FirstScreen implements Screen {
         font.getData().setScale(1.0f);
         // O texto será desenhado no centro do MUNDO de 800x600 unidades.
         font.draw(batch, meuTexto,
-                  (WORLD_WIDTH - textWidth) / 2, // Centro X do mundo
+                  (WORLD_WIDTH - textWidth) / 2, // Centro X do mundo e altura do texto
                   WORLD_HEIGHT / 2);             // Centro Y do mundo
         
         // Finaliza o lote
         batch.end();
-        
-     
-        
-     
+
     }
 
     @Override
@@ -193,6 +175,8 @@ public class FirstScreen implements Screen {
         // Libera os recursos
         batch.dispose();
         font.dispose();
+        if (greenBackground != null) greenBackground.dispose();
+        if (shapeRenderer != null) shapeRenderer.dispose();
     }
     
     // --- O resto dos métodos pode permanecer vazio ---
