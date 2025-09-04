@@ -15,6 +15,7 @@ gradle-app.setting
 /shared/build/
 
 ## Java:
+bin/
 *.class
 *.war
 *.ear
