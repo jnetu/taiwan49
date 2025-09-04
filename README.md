@@ -31,3 +31,11 @@ Useful Gradle tasks and flags:
 
 Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
 For example, `core:clean` removes `build` folder only from the `core` project.
+
+## TO-DO
+- Converter o antigo projeto feito em AWT/Swing para libGDX
+- Arrumar as traduções
+- implementar sons
+- implementar boss final
+- arrumar cutscene
+- transformar o antigo projeto para funcionar em qualquer resolução
