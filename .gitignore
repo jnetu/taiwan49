@@ -1,0 +1,17 @@
+out/
+dist/
+sources.txt
+
+# Eclipse IDE
+.metadata/
+bin/
+.settings/
+
+#Importante
+# .classpath e .project - caminhos
+!/.classpath
+!/.project
+
+# Sistema
+.DS_Store
+Thumbs.db
