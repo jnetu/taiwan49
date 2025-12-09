@@ -24,6 +24,8 @@ public class Game {
 	// personal configs
 	public boolean vsync = true;
 	public static double targetFPS = 60;
+	public static double last_targetFPS = 60;
+	
 	public final static double TARGET_TPS = 60.0;
 
 	// debug configs
@@ -84,6 +86,7 @@ public class Game {
 
 		// END PNG LOAD
 
+		WindowUtil.setWindowIcon(window, "/window/icon.png");
 		// pixel perfect camera
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -189,10 +192,11 @@ public class Game {
 		float h = playerTexture.getHeight() * SCALE;
 		TextureRenderer.drawTexture(playerTexture, x, y, w, h);
 
-		// drawText(debugInfo, 10, 10, 1.5f, 1f, 1f, 1f);
-		TextRenderer.drawText(debugInfo, 10, 10, 1.5f, 1f, 1f, 1f);
-		// drawText("'V' - V-Sync 'on'/'off'", 10, 30, 1.2f, 0.8f, 0.8f, 0.8f);
-		TextRenderer.drawText("'V' - V-Sync Toggle", 10, 30, 1.2f, 0.8f, 0.8f, 0.8f);
+		TextRenderer.drawText(debugInfo, 10, 10, 1.7f, 1f, 1f, 1f);
+		TextRenderer.drawText("'V' - V-Sync Toggle", 10, 30, 1.4f, 0.8f, 0.8f, 0.8f);
+		if(!vsync) {
+			TextRenderer.drawText("'F1/F2' - increase/decrease FPS(set 0 to ulimited fps) - " + targetFPS, 10, 50, 1.4f, 0.8f, 0.8f, 0.8f);
+		}
 
 		glfwSwapBuffers(window);
 	}

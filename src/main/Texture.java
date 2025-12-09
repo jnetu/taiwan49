@@ -59,14 +59,14 @@ public class Texture {
 			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 			glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-
+			
 			// free ram
 			stbi_image_free(image);
 		}
 	}
 	
 	// Método Auxiliar: Pega o arquivo do Classpath (JAR) e joga na Memória Nativa
-    private ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
+    public static ByteBuffer ioResourceToByteBuffer(String resource, int bufferSize) throws IOException {
         ByteBuffer buffer;
         
         // Pega o arquivo de dentro do JAR (começando com /)
@@ -90,7 +90,7 @@ public class Texture {
         buffer.flip();
         return buffer;
     }
-    private ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
+    private static ByteBuffer resizeBuffer(ByteBuffer buffer, int newCapacity) {
         ByteBuffer newBuffer = BufferUtils.createByteBuffer(newCapacity);
         buffer.flip();
         newBuffer.put(buffer);
