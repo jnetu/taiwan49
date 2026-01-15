@@ -25,7 +25,7 @@ public class Game {
 	public boolean vsync = true;
 	public static double targetFPS = 60;
 	public static double last_targetFPS = 60;
-	
+
 	public final static double TARGET_TPS = 60.0;
 
 	// debug configs
@@ -114,12 +114,18 @@ public class Game {
 			delta += (now - lastTime) / nsPerTick;
 			lastTime = now;
 
-			//boolean tickOn = false;
+			// boolean tickOn = false;
 			while (delta >= 1) {
 				tick();
 				ticks++;
 				delta--;
-				//tickOn = true; // only on tick
+				// tickOn = true; // only on tick
+
+				// hard reset - too many ticks & low render on poor pc :(
+				if (delta > 100) {
+					delta = 0;
+					break;
+				}
 			}
 
 			if (vsync) {
@@ -127,26 +133,35 @@ public class Game {
 				frames++;
 			} else if (targetFPS > 0) {
 
-				double nsPerFrame = 1000000000 / targetFPS;
-				long nowRender = System.nanoTime();
+				double nsPerFrame = 1000000000.0 / targetFPS;
+				// nextRenderTime - exactly next frame will be
+				long nextRenderTime = lastRenderTime + (long) nsPerFrame;
+				long now_t = System.nanoTime();
 
-				if (nowRender - lastRenderTime >= nsPerFrame) {
-					render();
-					frames++;
-					lastRenderTime = nowRender;
-				} else {
+				// CPU Saver !
+				if (now_t < nextRenderTime) {
 
-					long remainingTime = (long) (nsPerFrame - (nowRender - lastRenderTime));
+					while (now_t < nextRenderTime) {
+						long remainingTime = nextRenderTime - now_t;
 
-					// CPU Saver!
-					if (remainingTime > 1000000) {
-						try {
-							Thread.sleep(1);
-						} catch (InterruptedException e) {
+						if (remainingTime > 1500000) {
+							try {
+								Thread.sleep(1);
+							} catch (InterruptedException e) {
+								e.printStackTrace();
+							}
+						} else {
+							Thread.onSpinWait();
 						}
+						now_t = System.nanoTime();
 					}
 
 				}
+
+				render();
+				frames++;
+				lastRenderTime = now_t;
+
 			} else {
 				// Modo Ilimitado (targetFPS <= 0)
 				render();
@@ -173,7 +188,7 @@ public class Game {
 	}
 
 	public void tick() {
-		
+
 		Input.TickInput(this);
 		// tick here!
 	}
@@ -194,8 +209,9 @@ public class Game {
 
 		TextRenderer.drawText(debugInfo, 10, 10, 1.7f, 1f, 1f, 1f);
 		TextRenderer.drawText("'V' - V-Sync Toggle", 10, 30, 1.4f, 0.8f, 0.8f, 0.8f);
-		if(!vsync) {
-			TextRenderer.drawText("'F1/F2' - increase/decrease FPS(set 0 to ulimited fps) - " + targetFPS, 10, 50, 1.4f, 0.8f, 0.8f, 0.8f);
+		if (!vsync) {
+			TextRenderer.drawText("'F1/F2' - increase/decrease FPS(set 0 to ulimited fps) - " + targetFPS, 10, 50, 1.4f,
+					0.8f, 0.8f, 0.8f);
 		}
 
 		glfwSwapBuffers(window);
@@ -208,25 +224,29 @@ public class Game {
 		glfwTerminate();
 		glfwSetErrorCallback(null).free();
 	}
+
 	public long getWindow() {
 		return window;
 	}
+
 	public boolean getVsync() {
 		return vsync;
 	}
+
 	public int getShowFPS() {
 		return showFPS;
 	}
+
 	public int getShowTPS() {
 		return showTPS;
 	}
-	
-	
+
 	public void setDebugInfo() {
 		debugInfo = String.format("FPS: %d | TPS: %d | V-Sync: %s", showFPS, showTPS, (vsync ? "ON" : "OFF"));
 	}
+
 	public void setVsync(boolean vsync) {
-	    this.vsync = vsync;
+		this.vsync = vsync;
 	}
 
 }
