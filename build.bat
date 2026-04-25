@@ -4,7 +4,7 @@ setlocal
 :: --- CONFIGURAÇÕES ---
 set APP_NAME=Taiwan49
 set APP_VERSION=0.0.1
-set MAIN_CLASS=main.Game
+set MAIN_CLASS=main.Launcher
 set INPUT_DIR=dist\input_jars
 set OUTPUT_DIR=dist\build
 
