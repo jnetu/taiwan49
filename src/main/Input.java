@@ -1,21 +1,6 @@
 package main;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F1;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_F2;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_V;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_UP;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_DOWN;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_LEFT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_RIGHT;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_SPACE;
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
-import static org.lwjgl.glfw.GLFW.glfwGetKey;
-import static org.lwjgl.glfw.GLFW.glfwSetWindowShouldClose;
+import static org.lwjgl.glfw.GLFW.*;
 
 import util.WindowUtil;
 
@@ -23,18 +8,54 @@ public class Input {
 
 	private static long lastVsyncTime = 0;
 	private static long lastFpsTime = 0;
+	private static long lastMenuTime = 0;
+	private static long lastEnterTime = 0;
+	private static long lastSkipTime = 0;
+
+	// Debounce mínimo para teclas de navegação (ms)
+	private static final long DEBOUNCE = 180;
 
 	public static void TickInput(Game game) {
 		long window = game.getWindow();
 		long now = System.currentTimeMillis();
 
-		// EXIT
+		// ── Sair ─────────────────────────────────────────────────────────────
 		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
 			glfwSetWindowShouldClose(window, true);
 		}
 
-		// PLAYER MOVEMENT
-		if (Game.player != null) {
+		// ── Menu ─────────────────────────────────────────────────────────────
+		if (Game.state.equals("MENU") && Game.menu != null) {
+			if (now - lastMenuTime > DEBOUNCE) {
+				if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS) {
+					Game.menu.up = true;
+					lastMenuTime = now;
+				}
+				if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS || glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+					Game.menu.down = true;
+					lastMenuTime = now;
+				}
+			}
+			if (now - lastEnterTime > DEBOUNCE) {
+				if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+					Game.menu.enter = true;
+					lastEnterTime = now;
+				}
+			}
+		}
+
+		// ── Cutscene ─────────────────────────────────────────────────────────
+		if (Game.state.equals("CUTSCENE") && Game.cutscene != null) {
+			if (now - lastSkipTime > DEBOUNCE) {
+				if (glfwGetKey(window, GLFW_KEY_ENTER) == GLFW_PRESS) {
+					Game.cutscene.pressedSkip = true;
+					lastSkipTime = now;
+				}
+			}
+		}
+
+		// ── Jogo ─────────────────────────────────────────────────────────────
+		if (Game.state.equals("RUN") && Game.player != null) {
 			Game.player.right = glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS
 					|| glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS;
 			Game.player.left = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS
@@ -49,28 +70,23 @@ public class Input {
 			}
 		}
 
-		// VSYNC
-		if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS) {
-			if (now - lastVsyncTime > 200) {
-
-				boolean vsync = !game.getVsync();
-				game.setVsync(vsync);
-				WindowUtil.setVsync(vsync);
-				game.setDebugInfo();
-				lastVsyncTime = now;
-			}
-
+		// ── V-Sync toggle ────────────────────────────────────────────────────
+		if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS && now - lastVsyncTime > 200) {
+			boolean vsync = !game.getVsync();
+			game.setVsync(vsync);
+			WindowUtil.setVsync(vsync);
+			game.setDebugInfo();
+			lastVsyncTime = now;
 		}
 
-		if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS) {
-			if (now - lastFpsTime > 100) {
-				WindowUtil.modifyTargetFPS(10);
-			}
+		// ── FPS manual ───────────────────────────────────────────────────────
+		if (glfwGetKey(window, GLFW_KEY_F1) == GLFW_PRESS && now - lastFpsTime > 100) {
+			WindowUtil.modifyTargetFPS(10);
+			lastFpsTime = now;
 		}
-		if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS) {
-			if (now - lastFpsTime > 100) {
-				WindowUtil.modifyTargetFPS(-10);
-			}
+		if (glfwGetKey(window, GLFW_KEY_F2) == GLFW_PRESS && now - lastFpsTime > 100) {
+			WindowUtil.modifyTargetFPS(-10);
+			lastFpsTime = now;
 		}
 	}
 }

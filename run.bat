@@ -26,7 +26,7 @@ for %%f in ("%LIB_DIR%\*.jar") do (
     )
 )
 
-javac -d "%OUT_DIR%" -cp "%CP%" @sources.txt
+javac -encoding UTF-8 -d "%OUT_DIR%" -cp "%CP%" @sources.txt
 if %ERRORLEVEL% NEQ 0 (
     echo [ERRO] Falha na compilacao.
     del sources.txt

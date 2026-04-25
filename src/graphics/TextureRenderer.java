@@ -47,6 +47,23 @@ public class TextureRenderer {
         glEnable(GL_TEXTURE_2D);
     }
 
+    /** Retângulo com alpha — útil para fade overlay. */
+    public static void fillRectAlpha(float x, float y, float width, float height, float r, float g, float b, float a) {
+        glDisable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glColor4f(r, g, b, a);
+
+        glBegin(GL_QUADS);
+            glVertex2f(x,         y);
+            glVertex2f(x + width, y);
+            glVertex2f(x + width, y + height);
+            glVertex2f(x,         y + height);
+        glEnd();
+
+        glEnable(GL_TEXTURE_2D);
+    }
+
     public static void drawRect(float x, float y, float width, float height, float r, float g, float b) {
         glDisable(GL_TEXTURE_2D);
         glColor3f(r, g, b);

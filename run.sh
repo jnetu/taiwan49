@@ -16,7 +16,7 @@ mkdir -p "$OUT_DIR"
 SOURCES=$(find "$SRC_DIR" -name "*.java")
 CP=$(find "$LIB_DIR" -name "*.jar" | tr '\n' ':')
 
-javac -d "$OUT_DIR" -cp "$CP" $SOURCES
+javac -encoding UTF-8 -d "$OUT_DIR" -cp "$CP" $SOURCES
 echo "      OK"
 
 # ── Recursos ───────────────────────────────────────────────────────────────
